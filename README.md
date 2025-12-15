@@ -4,13 +4,27 @@ Lightweight, composable utilities for documentation sites.
 
 ## Packages
 
-- **compass** — Headless tree navigation state machine (pure, portable to any runtime)
-- **teleport** — Keyboard bindings + DOM integration for compass
-- **lantern** — Theme toggle with flash-free hydration
-- **atlas** — Magic links with build-time resolution and broken link detection
-- **lighthouse** — 404 recovery with fuzzy matching
+| Package | Description | Status |
+|---------|-------------|--------|
+| **compass** | Headless tree navigation state machine | Implemented |
+| **teleport** | Vim-style keyboard navigation | Implemented |
+| **lantern** | Theme toggle with flash-free hydration | Implemented |
+| **lighthouse** | Smart 404 with fuzzy URL matching | Implemented |
+| **atlas** | Wiki-style `[[magic links]]` for markdown | Implemented |
+| **spyglass** | Headless fuzzy finder for site search | Planned |
+| **scribe** | Extract and test code from documentation | Planned |
 
-Core packages are framework-agnostic. Astro wrappers available for teleport, lantern, and lighthouse.
+All packages are framework-agnostic. Astro components available for teleport, lantern, and lighthouse.
+
+## Philosophy
+
+Each package does one thing. No batteries-included monolith. Pick what you need.
+
+Headless where possible. You control the UI.
+
+## Documentation
+
+See the [docs site](https://github.com/joshribakoff/sailkit/tree/docs-website/docs) which dogfoods all implemented packages.
 
 ## License
 
