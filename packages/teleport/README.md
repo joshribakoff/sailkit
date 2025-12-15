@@ -1,14 +1,17 @@
 # teleport
 
-Keyboard bindings that wire to compass navigators and apply state to DOM.
+Keyboard bindings that wire to compass navigators.
 
 ## Layers
 
 ```
 Layer 1: Key bindings (pure functions)
-Layer 2: DOM adapter (applies highlight class, scrollIntoView)
+Layer 2a: DOM adapter (applies highlight class, scrollIntoView)
+Layer 2b: State callbacks (wire to React/Vue/etc state)
 Layer 3: Full integration (batteries included)
 ```
+
+Layer 2a applies state directly to the DOM via classes. Layer 2b instead calls back into your framework's state system, letting you manage highlight state in React, Vue, or whatever you're using.
 
 ## API
 
