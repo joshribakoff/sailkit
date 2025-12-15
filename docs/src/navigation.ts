@@ -19,6 +19,8 @@ export const navigation: NavItem[] = [
       'lantern',
       'lighthouse',
       'atlas',
+      'spyglass',
+      'scribe',
     ],
   },
   {
@@ -45,6 +47,8 @@ export const titles: Record<string, string> = {
   'lantern': 'Lantern',
   'lighthouse': 'Lighthouse',
   'atlas': 'Atlas',
+  'spyglass': 'Spyglass',
+  'scribe': 'Scribe',
   'guides': 'Guides',
   'vim-navigation': 'Vim Navigation',
   'theming': 'Theming',

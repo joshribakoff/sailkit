@@ -5,9 +5,9 @@ description: Detailed documentation for each Sailkit package.
 
 # Packages
 
-Sailkit consists of five focused packages. Each solves one problem well and can be used independently or together.
+Sailkit consists of seven packages. Five are implemented, two are planned. Each solves one problem well and can be used independently or together.
 
-## The Five Packages
+## Implemented Packages
 
 ### [[compass]] - Navigation State
 
@@ -56,6 +56,28 @@ Wikipedia-style link syntax for markdown. Write `[[page]]` instead of `[page](/d
 - Colon syntax: `[:page]` for alternative style
 - Remark plugin for Astro/Next.js/etc.
 
+## Planned Packages
+
+### [[spyglass]] - Site Search UI
+
+Command palette and sidebar filtering. A **UI layer** that integrates with search engines like Fuse.js, MiniSearch, or Pagefind.
+
+**Planned features:**
+- Command palette modal (⌘K)
+- Inline sidebar filter mode
+- Adapters for multiple search engines
+- Keyboard navigation within results
+
+### [[scribe]] - Documentation Testing
+
+Extract and test code from markdown documentation. Prevents documentation rot by verifying code examples actually work.
+
+**Planned features:**
+- Extract code blocks from markdown
+- Language-aware execution (TS, JS, bash)
+- Skip patterns for incomplete examples
+- CI integration
+
 ## Package Dependencies
 
 ```
@@ -63,19 +85,23 @@ atlas ─────────────────┐
 lighthouse ────────────┤
 lantern ───────────────┼─► Your App
 teleport ──────────────┤
-compass ───────────────┘
+compass ───────────────┤
+spyglass (planned) ────┤
+scribe (planned) ──────┘
 ```
 
 No Sailkit package depends on another. Use any combination you need.
 
 ## Comparison Table
 
-| Package | Build-time | Runtime | Astro Component | Headless |
-|---------|------------|---------|-----------------|----------|
-| [[compass]] | Yes | Yes | No | Yes |
-| [[teleport]] | No | Yes | Yes | Partial |
-| [[lantern]] | Partial | Yes | Yes | Yes |
-| [[lighthouse]] | No | Yes | Yes | Yes |
-| [[atlas]] | Yes | No | No | Yes |
+| Package | Status | Build-time | Runtime | Astro Component | Headless |
+|---------|--------|------------|---------|-----------------|----------|
+| [[compass]] | Implemented | Yes | Yes | No | Yes |
+| [[teleport]] | Implemented | No | Yes | Yes | Partial |
+| [[lantern]] | Implemented | Partial | Yes | Yes | Yes |
+| [[lighthouse]] | Implemented | No | Yes | Yes | Yes |
+| [[atlas]] | Implemented | Yes | No | No | Yes |
+| [[spyglass]] | Planned | No | Yes | Yes | No |
+| [[scribe]] | Planned | Yes | Yes | No | Yes |
 
 Select a package from the sidebar to learn more.
