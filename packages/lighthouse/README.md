@@ -55,7 +55,8 @@ const defaultMatcher = createCompositeMatcher([
 ```astro
 // src/pages/404.astro
 ---
-import { NotFound } from 'astro-lighthouse';
+import NotFound from '@sailkit/lighthouse/NotFound.astro';
+import Layout from '../layouts/Layout.astro';
 
 const pages = posts.map(p => ({
   url: `/posts/${p.slug}/`,
@@ -63,11 +64,18 @@ const pages = posts.map(p => ({
   section: 'Posts'
 }));
 ---
-<NotFound
-  pages={pages}
-  autoRedirectThreshold={0.6}
-  maxSuggestions={5}
-/>
+<Layout title="Page Not Found">
+  <NotFound
+    pages={pages}
+    autoRedirectThreshold={0.6}
+    maxSuggestions={5}
+  >
+    <Fragment slot="actions">
+      <a href="/" class="btn">Go Home</a>
+      <a href="/posts/" class="btn">Browse Posts</a>
+    </Fragment>
+  </NotFound>
+</Layout>
 ```
 
 ## Behavior

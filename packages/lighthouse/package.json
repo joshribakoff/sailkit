@@ -1,0 +1,39 @@
+{
+  "name": "@sailkit/lighthouse",
+  "version": "0.1.0",
+  "description": "404 recovery with fuzzy matching and auto-redirect",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./NotFound.astro": "./NotFound.astro",
+    "./styles.css": "./styles.css"
+  },
+  "files": [
+    "dist",
+    "NotFound.astro",
+    "styles.css"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": [
+    "404",
+    "fuzzy-matching",
+    "levenshtein",
+    "redirect",
+    "astro"
+  ],
+  "license": "MIT"
+}

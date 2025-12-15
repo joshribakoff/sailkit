@@ -1,0 +1,233 @@
+---
+/**
+ * NotFound - Drop-in 404 page component with fuzzy matching
+ *
+ * @example
+ * ```astro
+ * ---
+ * import { NotFound } from '@sailkit/lighthouse/NotFound.astro';
+ * import { getAllCollectionsSorted } from '../utils/collections';
+ *
+ * const collections = await getAllCollectionsSorted();
+ * const pages = collections.flatMap(c =>
+ *   c.entries.map(e => ({
+ *     url: `/${c.name}/${e.slug}/`,
+ *     title: e.data.title,
+ *     section: c.displayName
+ *   }))
+ * );
+ * ---
+ * <NotFound pages={pages} />
+ * ```
+ */
+
+export interface Props {
+  /** List of valid pages to match against */
+  pages: Array<{ url: string; title: string; section?: string }>;
+  /** Score threshold for auto-redirect (default: 0.6) */
+  autoRedirectThreshold?: number;
+  /** Maximum suggestions to show (default: 5) */
+  maxSuggestions?: number;
+  /** Delay before auto-redirect in ms (default: 1500) */
+  redirectDelay?: number;
+  /** Custom class for container */
+  class?: string;
+}
+
+const {
+  pages,
+  autoRedirectThreshold = 0.6,
+  maxSuggestions = 5,
+  redirectDelay = 1500,
+  class: className = ''
+} = Astro.props;
+
+// Serialize config for client-side script
+const clientConfig = {
+  pages,
+  autoRedirectThreshold,
+  maxSuggestions,
+  redirectDelay,
+};
+---
+
+<div class:list={["lighthouse-container", className]}>
+  <div class="lighthouse-code">404</div>
+  <h1 class="lighthouse-title">Page Not Found</h1>
+  <p class="lighthouse-description">
+    The page you're looking for doesn't exist or may have been moved.
+  </p>
+
+  <div id="lighthouse-redirect" class="lighthouse-redirect lighthouse-hidden">
+    <p>
+      <span class="lighthouse-spinner"></span>
+      Found a match! Redirecting to <a id="lighthouse-redirect-link" href="#">...</a>
+    </p>
+  </div>
+
+  <div id="lighthouse-suggestions" class="lighthouse-suggestions lighthouse-hidden">
+    <p class="lighthouse-suggestions-title">Did you mean one of these?</p>
+    <ul id="lighthouse-suggestion-list" class="lighthouse-suggestion-list">
+      <!-- Populated by JavaScript -->
+    </ul>
+  </div>
+
+  <div id="lighthouse-searching" class="lighthouse-searching">
+    <span class="lighthouse-spinner"></span> Looking for similar pages...
+  </div>
+
+  <div class="lighthouse-actions">
+    <slot name="actions">
+      <a href="/" class="btn btn-primary">Go Home</a>
+    </slot>
+  </div>
+</div>
+
+<script define:vars={{ clientConfig }}>
+  // Fuzzy matching utilities (inlined for standalone use)
+
+  function levenshteinDistance(a, b) {
+    const matrix = Array(b.length + 1).fill(null).map(() =>
+      Array(a.length + 1).fill(null)
+    );
+
+    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+
+    for (let j = 1; j <= b.length; j++) {
+      for (let i = 1; i <= a.length; i++) {
+        const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
+        matrix[j][i] = Math.min(
+          matrix[j][i - 1] + 1,
+          matrix[j - 1][i] + 1,
+          matrix[j - 1][i - 1] + indicator
+        );
+      }
+    }
+
+    return matrix[b.length][a.length];
+  }
+
+  function calculateSimilarity(requestedPath, page) {
+    const pageUrl = page.url.toLowerCase();
+    const pageTitle = page.title.toLowerCase();
+    const requested = requestedPath.toLowerCase();
+
+    const requestedParts = requested.split('/').filter(Boolean);
+    const pageParts = pageUrl.split('/').filter(Boolean);
+
+    let score = 0;
+
+    // 1. Exact slug match (highest priority)
+    const requestedSlug = requestedParts[requestedParts.length - 1];
+    const pageSlug = pageParts[pageParts.length - 1];
+    if (requestedSlug && pageSlug && requestedSlug === pageSlug) {
+      score += 0.6;
+    }
+
+    // 2. Levenshtein similarity
+    const maxLen = Math.max(requested.length, pageUrl.length);
+    if (maxLen > 0) {
+      const levDistance = levenshteinDistance(requested, pageUrl);
+      score += (1 - levDistance / maxLen) * 0.2;
+    }
+
+    // 3. Token overlap
+    const requestedTokens = requested.replace(/[/-]/g, ' ').split(/\s+/).filter(Boolean);
+    const titleTokens = pageTitle.split(/\s+/).filter(Boolean);
+    const allPageTokens = [...pageParts, ...titleTokens];
+
+    let tokenMatches = 0;
+    for (const reqToken of requestedTokens) {
+      for (const pageToken of allPageTokens) {
+        if (pageToken.includes(reqToken) || reqToken.includes(pageToken)) {
+          tokenMatches++;
+          break;
+        }
+      }
+    }
+    if (requestedTokens.length > 0) {
+      score += (tokenMatches / requestedTokens.length) * 0.2;
+    }
+
+    return Math.min(score, 1);
+  }
+
+  function findMatches(requestedPath) {
+    const { pages, maxSuggestions } = clientConfig;
+    const scored = pages.map(page => ({
+      ...page,
+      score: calculateSimilarity(requestedPath, page)
+    }));
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.filter(p => p.score > 0.15).slice(0, maxSuggestions);
+  }
+
+  function showSuggestions(matches) {
+    const container = document.getElementById('lighthouse-suggestions');
+    const list = document.getElementById('lighthouse-suggestion-list');
+    const searchingMsg = document.getElementById('lighthouse-searching');
+
+    searchingMsg?.classList.add('lighthouse-hidden');
+
+    if (matches.length === 0) return;
+
+    list.innerHTML = matches.map(match => `
+      <li class="lighthouse-suggestion-item">
+        <a href="${match.url}" class="lighthouse-suggestion-link">
+          <span class="lighthouse-suggestion-title">${match.title}</span>
+          ${match.section ? `<span class="lighthouse-suggestion-section">${match.section}</span>` : ''}
+          <span class="lighthouse-suggestion-url">${match.url}</span>
+        </a>
+      </li>
+    `).join('');
+
+    container?.classList.remove('lighthouse-hidden');
+  }
+
+  function autoRedirect(match) {
+    const { redirectDelay } = clientConfig;
+    const notice = document.getElementById('lighthouse-redirect');
+    const link = document.getElementById('lighthouse-redirect-link');
+    const searchingMsg = document.getElementById('lighthouse-searching');
+
+    searchingMsg?.classList.add('lighthouse-hidden');
+
+    if (link && notice) {
+      link.textContent = match.title;
+      link.href = match.url;
+      notice.classList.remove('lighthouse-hidden');
+
+      setTimeout(() => {
+        window.location.href = match.url;
+      }, redirectDelay);
+    }
+  }
+
+  // Main logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const { autoRedirectThreshold } = clientConfig;
+    const currentPath = window.location.pathname;
+
+    setTimeout(() => {
+      const matches = findMatches(currentPath);
+
+      if (matches.length > 0) {
+        const bestMatch = matches[0];
+
+        const singleMatch = matches.length === 1;
+        const strongMatch = bestMatch.score > autoRedirectThreshold;
+        const clearWinner = matches.length > 1 && matches[0].score > matches[1].score + 0.2;
+
+        if (singleMatch || (strongMatch && clearWinner)) {
+          autoRedirect(bestMatch);
+        } else {
+          showSuggestions(matches);
+        }
+      } else {
+        document.getElementById('lighthouse-searching')?.classList.add('lighthouse-hidden');
+      }
+    }, 300);
+  });
+</script>
