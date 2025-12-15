@@ -1,0 +1,56 @@
+{
+  "name": "@sailkit/atlas",
+  "version": "0.1.0",
+  "description": "Wikipedia-style magic links with build-time resolution",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./remark": {
+      "import": "./dist/remark-magic-links.js",
+      "types": "./dist/remark-magic-links.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.0",
+    "@types/node": "^20.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "typescript": "^5.3.0",
+    "unified": "^11.0.0",
+    "vitest": "^2.0.0"
+  },
+  "peerDependencies": {
+    "unified": ">=10.0.0"
+  },
+  "peerDependenciesMeta": {
+    "unified": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "remark",
+    "mdast",
+    "magic-links",
+    "wiki-links",
+    "markdown",
+    "astro"
+  ],
+  "license": "MIT"
+}

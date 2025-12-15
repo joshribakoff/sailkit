@@ -36,8 +36,8 @@ interface LinkTarget {
 }
 
 type ResolveResult =
-  | { status: 'resolved'; target: LinkTarget }
-  | { status: 'placeholder'; target: LinkTarget }
+  | { status: 'resolved'; target: LinkTarget; matchedId: string }
+  | { status: 'placeholder'; target: LinkTarget; matchedId: string }
   | { status: 'unresolved'; id: string };
 
 function createLinkResolver(targets: LinkTarget[]): {
