@@ -1,0 +1,243 @@
+---
+/**
+ * Teleport - Vim-style keyboard navigation for Astro sites.
+ *
+ * Provides j/k navigation in sidebar, Ctrl+d/u for content scroll,
+ * h/l for prev/next page, and t for fuzzy finder.
+ */
+interface Props {
+  /** CSS selector for navigable items (default: '.nav-item') */
+  itemSelector?: string;
+  /** CSS selector for content container (default: 'main') */
+  contentSelector?: string;
+  /** CSS selector for sidebar container (default: '.sidebar') */
+  sidebarSelector?: string;
+  /** Class to add to highlighted item (default: 'teleport-highlight') */
+  highlightClass?: string;
+  /** Enable fuzzy finder (requires onOpenFinder callback) */
+  enableFinder?: boolean;
+}
+
+const {
+  itemSelector = '.nav-item',
+  contentSelector = 'main',
+  sidebarSelector = '.sidebar',
+  highlightClass = 'teleport-highlight',
+  enableFinder = false,
+} = Astro.props;
+---
+
+<style is:global define:vars={{ highlightClass }}>
+  .teleport-highlight {
+    outline: 2px solid var(--color-accent, #3b82f6);
+    outline-offset: -2px;
+    background-color: var(--color-accent-dim, rgba(59, 130, 246, 0.1));
+  }
+</style>
+
+<script
+  define:vars={{
+    itemSelector,
+    contentSelector,
+    sidebarSelector,
+    highlightClass,
+    enableFinder,
+  }}
+>
+  function initTeleport() {
+    // DOM elements
+    const items = () => Array.from(document.querySelectorAll(itemSelector));
+    const content = document.querySelector(contentSelector) || document.documentElement;
+    const sidebar = document.querySelector(sidebarSelector);
+
+    // State
+    let currentIndex = -1;
+
+    // Helpers
+    function clearHighlight() {
+      items().forEach((item) => item.classList.remove(highlightClass));
+    }
+
+    function highlight(index) {
+      clearHighlight();
+      const allItems = items();
+      if (index >= 0 && index < allItems.length) {
+        currentIndex = index;
+        const item = allItems[index];
+        item.classList.add(highlightClass);
+        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function next() {
+      const allItems = items();
+      if (allItems.length === 0) return;
+      if (currentIndex < 0) {
+        highlight(0);
+      } else {
+        highlight((currentIndex + 1) % allItems.length);
+      }
+    }
+
+    function prev() {
+      const allItems = items();
+      if (allItems.length === 0) return;
+      if (currentIndex < 0) {
+        highlight(allItems.length - 1);
+      } else {
+        highlight((currentIndex - 1 + allItems.length) % allItems.length);
+      }
+    }
+
+    function scrollContent(direction) {
+      const amount = window.innerHeight / 2;
+      content.scrollBy({
+        top: direction === 'down' ? amount : -amount,
+        behavior: 'smooth',
+      });
+    }
+
+    function selectCurrent() {
+      const allItems = items();
+      if (currentIndex >= 0 && currentIndex < allItems.length) {
+        const item = allItems[currentIndex];
+        const href = item.getAttribute('href');
+        if (href) {
+          window.location.href = href;
+        }
+      }
+    }
+
+    function findNextPage() {
+      const allItems = items();
+      // Find current page in nav
+      const currentPath = window.location.pathname;
+      const pageIndex = allItems.findIndex(
+        (item) => item.getAttribute('href') === currentPath
+      );
+      if (pageIndex !== -1 && pageIndex < allItems.length - 1) {
+        const nextHref = allItems[pageIndex + 1].getAttribute('href');
+        if (nextHref) window.location.href = nextHref;
+      }
+    }
+
+    function findPrevPage() {
+      const allItems = items();
+      const currentPath = window.location.pathname;
+      const pageIndex = allItems.findIndex(
+        (item) => item.getAttribute('href') === currentPath
+      );
+      if (pageIndex > 0) {
+        const prevHref = allItems[pageIndex - 1].getAttribute('href');
+        if (prevHref) window.location.href = prevHref;
+      }
+    }
+
+    function isTyping(event) {
+      const target = event.target;
+      if (!target) return false;
+      const tagName = target.tagName.toLowerCase();
+      if (tagName === 'input' || tagName === 'textarea') return true;
+      if (target.isContentEditable || target.getAttribute('contenteditable') === 'true') {
+        return true;
+      }
+      return false;
+    }
+
+    // Keyboard handler
+    function handleKeydown(event) {
+      if (isTyping(event)) return;
+
+      const key = event.key.toLowerCase();
+
+      // j/k or arrows - nav items
+      if (key === 'j' || key === 'arrowdown') {
+        event.preventDefault();
+        next();
+        return;
+      }
+      if (key === 'k' || key === 'arrowup') {
+        event.preventDefault();
+        prev();
+        return;
+      }
+
+      // Ctrl+d/u - scroll content
+      if (event.ctrlKey && key === 'd') {
+        event.preventDefault();
+        scrollContent('down');
+        return;
+      }
+      if (event.ctrlKey && key === 'u') {
+        event.preventDefault();
+        scrollContent('up');
+        return;
+      }
+
+      // h/l or arrows - prev/next page
+      if (key === 'l' || key === 'arrowright') {
+        event.preventDefault();
+        findNextPage();
+        return;
+      }
+      if (key === 'h' || key === 'arrowleft') {
+        event.preventDefault();
+        findPrevPage();
+        return;
+      }
+
+      // Enter - select
+      if (key === 'enter') {
+        event.preventDefault();
+        selectCurrent();
+        return;
+      }
+
+      // t - fuzzy finder
+      if (enableFinder && key === 't') {
+        event.preventDefault();
+        // Emit custom event for fuzzy finder
+        document.dispatchEvent(new CustomEvent('teleport:open-finder'));
+        return;
+      }
+
+      // Escape - clear
+      if (key === 'escape') {
+        clearHighlight();
+        currentIndex = -1;
+        return;
+      }
+    }
+
+    // Sync with current URL
+    function syncWithUrl() {
+      const allItems = items();
+      const currentPath = window.location.pathname;
+      const index = allItems.findIndex(
+        (item) => item.getAttribute('href') === currentPath
+      );
+      if (index !== -1) {
+        highlight(index);
+      }
+    }
+
+    // Initialize
+    document.addEventListener('keydown', handleKeydown);
+    syncWithUrl();
+
+    // Cleanup function for Astro transitions
+    return () => {
+      document.removeEventListener('keydown', handleKeydown);
+      clearHighlight();
+    };
+  }
+
+  // Run on initial load
+  let cleanup = initTeleport();
+
+  // Re-run after Astro page transitions
+  document.addEventListener('astro:after-swap', () => {
+    if (cleanup) cleanup();
+    cleanup = initTeleport();
+  });
+</script>

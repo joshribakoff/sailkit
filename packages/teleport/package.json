@@ -1,0 +1,48 @@
+{
+  "name": "@sailkit/teleport",
+  "version": "0.1.0",
+  "description": "Vim-style keyboard navigation bindings with DOM integration",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./Teleport.astro": "./Teleport.astro"
+  },
+  "files": [
+    "dist",
+    "Teleport.astro"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@sailkit/compass": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@sailkit/compass": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@sailkit/compass": "file:../compass",
+    "jsdom": "^25.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": [
+    "vim",
+    "keyboard",
+    "navigation",
+    "keybindings",
+    "hjkl"
+  ],
+  "license": "MIT"
+}

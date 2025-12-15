@@ -1,78 +1,128 @@
-# teleport
+# @sailkit/teleport
 
-Keyboard bindings that wire to compass navigators.
+Vim-style keyboard navigation bindings with DOM integration.
 
-## Layers
-
-```
-Layer 1: Key bindings (pure functions)
-Layer 2a: DOM adapter (applies highlight class, scrollIntoView)
-Layer 2b: State callbacks (wire to React/Vue/etc state)
-Layer 3: Full integration (batteries included)
-```
-
-Layer 2a applies state directly to the DOM via classes. Layer 2b instead calls back into your framework's state system, letting you manage highlight state in React, Vue, or whatever you're using.
-
-## API
-
-```typescript
-// Layer 1: Keyboard event handling
-interface KeyBindings {
-  next?: string[];      // default ['j', 'ArrowDown']
-  prev?: string[];      // default ['k', 'ArrowUp']
-  select?: string[];    // default ['Enter']
-  nextGroup?: string[]; // default [']]', 'Tab']
-  prevGroup?: string[]; // default ['[[', 'Shift+Tab']
-  escape?: string[];    // default ['Escape']
-}
-
-function createKeyboardHandler(config: {
-  bindings?: KeyBindings;
-  onNext?: () => void;
-  onPrev?: () => void;
-  onSelect?: () => void;
-  onNextGroup?: () => void;
-  onPrevGroup?: () => void;
-  onEscape?: () => void;
-  ignoreWhenTyping?: boolean;  // default true
-}): {
-  handleKeydown: (event: KeyboardEvent) => void;
-  destroy: () => void;
-};
-
-// Layer 2: DOM adapter
-function createDOMNavigator(config: {
-  getItems: () => HTMLElement[];
-  highlightClass?: string;     // default 'highlight'
-  activeClass?: string;        // default 'active'
-  scrollBehavior?: ScrollIntoViewOptions;
-  onSelect?: (item: HTMLElement) => void;
-}): {
-  navigator: Navigator<HTMLElement>;
-  highlight(index: number): void;
-  clearHighlight(): void;
-};
-
-// Layer 3: Full integration
-function initTeleport(config: {
-  itemSelector: string;
-  groupSelector?: string;
-  highlightClass?: string;
-  bindings?: KeyBindings;
-  onSelect?: (item: HTMLElement) => void;
-}): {
-  destroy: () => void;
-};
-```
-
-## Astro Integration
+## Quick Start (Astro)
 
 ```astro
 ---
-import { Teleport } from 'astro-teleport';
+import Teleport from '@sailkit/teleport/Teleport.astro';
 ---
+<html>
+  <body>
+    <nav class="sidebar">
+      <a class="nav-item" href="/page-1">Page 1</a>
+      <a class="nav-item" href="/page-2">Page 2</a>
+    </nav>
+    <main>Content</main>
+    <Teleport />
+  </body>
+</html>
+```
+
+## Default Bindings
+
+| Key | Action |
+|-----|--------|
+| `j` / `ArrowDown` | Next item in sidebar |
+| `k` / `ArrowUp` | Previous item in sidebar |
+| `Ctrl+d` | Scroll content down |
+| `Ctrl+u` | Scroll content up |
+| `l` / `ArrowRight` | Next page |
+| `h` / `ArrowLeft` | Previous page |
+| `Enter` | Navigate to highlighted item |
+| `t` | Open fuzzy finder (when enabled) |
+| `Escape` | Clear highlight |
+
+## Astro Component Props
+
+```astro
 <Teleport
   itemSelector=".nav-item"
-  groupSelector=".nav-section-title"
+  contentSelector="main"
+  sidebarSelector=".sidebar"
+  highlightClass="teleport-highlight"
+  enableFinder={false}
 />
+```
+
+## Programmatic API
+
+Three layers of abstraction for custom integrations:
+
+```typescript
+// Layer 3: Full integration (batteries included)
+import { initTeleport } from '@sailkit/teleport';
+
+const teleport = initTeleport({
+  itemSelector: '.nav-item',
+  onNextPage: () => router.push(nextUrl),
+  onPrevPage: () => router.push(prevUrl),
+  onOpenFinder: () => openFuzzyFinder(),
+});
+
+// Cleanup
+teleport.destroy();
+
+// Layer 2: DOM adapter only
+import { createDOMNavigator } from '@sailkit/teleport';
+
+const navigator = createDOMNavigator({
+  getItems: () => document.querySelectorAll('.item'),
+  highlightClass: 'my-highlight',
+  onSelect: (item, index) => console.log('Selected', item),
+});
+
+navigator.next();
+navigator.prev();
+navigator.goTo(5);
+
+// Layer 1: Pure key bindings
+import { createKeyboardHandler, DEFAULT_BINDINGS } from '@sailkit/teleport';
+
+const handler = createKeyboardHandler({
+  bindings: { ...DEFAULT_BINDINGS, nextItem: ['n'] },
+  onNextItem: () => navigator.next(),
+  onPrevItem: () => navigator.prev(),
+});
+
+document.addEventListener('keydown', handler.handleKeydown);
+```
+
+## Custom Bindings
+
+```typescript
+import { initTeleport } from '@sailkit/teleport';
+
+initTeleport({
+  itemSelector: '.nav-item',
+  bindings: {
+    nextItem: ['n', 'ArrowDown'],
+    prevItem: ['p', 'ArrowUp'],
+    scrollDown: ['Ctrl+f'],
+    scrollUp: ['Ctrl+b'],
+  },
+});
+```
+
+## Styling
+
+Default highlight styles are injected. Override with CSS:
+
+```css
+.teleport-highlight {
+  outline: 2px solid var(--color-accent);
+  background-color: var(--color-accent-dim);
+}
+```
+
+## Fuzzy Finder Integration
+
+Listen for the `teleport:open-finder` event:
+
+```javascript
+document.addEventListener('teleport:open-finder', () => {
+  // Open your fuzzy finder UI
+  // Use @sailkit/compass data structure for items
+});
 ```
