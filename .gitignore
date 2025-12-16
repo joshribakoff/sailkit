@@ -3,6 +3,7 @@ node_modules/
 
 # Build output
 dist/
+.astro/
 
 # Lock files (using npm)
 package-lock.json

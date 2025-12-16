@@ -1,10 +1,15 @@
 /**
- * In-process runner using esbuild transform + vm module
- * Much faster than spawning child processes (~240x speedup)
+ * IMPORTANT: THIS MODULE MUST BE READ-ONLY FILESYSTEM SAFE
+ * No temp files, no disk writes - everything stays in memory.
+ *
+ * In-process runner using esbuild build + vm module
+ * Bundles imports so code blocks can use real packages
  */
 
 import vm from 'node:vm'
-import { transform } from 'esbuild'
+import assert from 'node:assert'
+import { build } from 'esbuild'
+import { dirname } from 'node:path'
 import type { CodeBlock } from './parser.js'
 
 export interface RunResult {
@@ -18,16 +23,21 @@ export async function runBlock(block: CodeBlock): Promise<RunResult> {
   const isTypeScript = block.language === 'typescript' || block.language === 'ts'
 
   try {
-    // Transpile TypeScript to JavaScript if needed
-    let code = block.code
-    if (isTypeScript) {
-      const result = await transform(code, {
-        loader: 'ts',
-        format: 'cjs', // vm.runInContext works better with CJS
-        target: 'node18'
-      })
-      code = result.code
-    }
+    // Bundle with esbuild using stdin - no temp files
+    const result = await build({
+      stdin: {
+        contents: block.code,
+        loader: isTypeScript ? 'ts' : 'js',
+        resolveDir: dirname(block.file), // resolve imports relative to markdown file
+      },
+      bundle: true,
+      write: false,
+      format: 'cjs',
+      platform: 'node',
+      target: 'node18',
+    })
+
+    const code = result.outputFiles[0].text
 
     // Capture console output
     let stdout = ''
@@ -39,8 +49,10 @@ export async function runBlock(block: CodeBlock): Promise<RunResult> {
     }
 
     // Create sandbox with common globals
+    // assert is provided globally so code blocks can use it without imports
     const sandbox = {
       console: mockConsole,
+      assert,
       setTimeout,
       setInterval,
       clearTimeout,

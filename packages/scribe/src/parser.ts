@@ -1,4 +1,7 @@
 /**
+ * IMPORTANT: THIS MODULE MUST BE READ-ONLY FILESYSTEM SAFE
+ * No temp files, no disk writes - everything stays in memory.
+ *
  * Code fence parser - extracts fenced code blocks from markdown
  */
 
