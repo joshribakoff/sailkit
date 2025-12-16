@@ -1,0 +1,28 @@
+{
+  "name": "@sailkit/scribe",
+  "version": "0.0.1",
+  "description": "Extract and test code fences from markdown documentation",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "scribe": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node dist/cli.js"
+  },
+  "keywords": [
+    "documentation",
+    "testing",
+    "markdown",
+    "code-fence"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "log-update": "^7.0.2"
+  }
+}
