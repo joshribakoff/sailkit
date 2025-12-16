@@ -124,10 +124,10 @@ createTeleport({
   itemSelector: '.nav-item',
   sidebarSelector: '.sidebar',
 
-  // 'ignore' (default) - j/k/arrows scroll content when sidebar hidden
+  // 'ignore' (default) - j/k/arrows scroll content, Enter does nothing
   whenHidden: 'ignore',
 
-  // 'show-sidebar' - j/k/arrows auto-open sidebar, then navigate
+  // 'show-sidebar' - j/k/arrows/Enter auto-open sidebar, then navigate
   whenHidden: 'show-sidebar',
 });
 ```

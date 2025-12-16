@@ -33,7 +33,7 @@ export interface CreateTeleportConfig {
   bindings?: KeyBindings;
   /** Ignore keystrokes when typing (default: true) */
   ignoreWhenTyping?: boolean;
-  /** What to do when j/k/arrows pressed while sidebar hidden (default: 'ignore' scrolls content) */
+  /** What to do when navigation keys pressed while sidebar hidden (default: 'ignore' scrolls content, Enter does nothing) */
   whenHidden?: WhenHiddenBehavior;
   /** Callback when item is selected (Enter pressed) */
   onSelect?: (element: HTMLElement, slug: string) => void;
