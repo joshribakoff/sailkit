@@ -25,13 +25,8 @@
     "test:e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@bearing-dev/compass": ">=0.0.1"
-  },
-  "peerDependenciesMeta": {
-    "@bearing-dev/compass": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",

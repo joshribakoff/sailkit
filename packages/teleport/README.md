@@ -1,6 +1,27 @@
 # @bearing-dev/teleport
 
-Vim-style keyboard navigation bindings with DOM integration.
+Vim-style keyboard navigation for any website.
+
+## Design Philosophy
+
+**Drop-in for any website.** Teleport is a vanilla JavaScript library that works with any DOM. Just provide CSS selectors and it handles everything else.
+
+**Internally uses Compass.** Teleport scans the DOM and builds a navigation tree using [@bearing-dev/compass](../compass). You get hierarchical navigation for free.
+
+**Framework-agnostic.** The core is pure JavaScript. The Astro component is a convenience wrapper.
+
+```javascript
+// Works anywhere - no framework required
+import { createTeleport } from '@bearing-dev/teleport';
+
+const teleport = createTeleport({
+  itemSelector: '.nav-item',
+  highlightClass: 'highlight',
+});
+
+// Cleanup when done
+teleport.destroy();
+```
 
 ## Quick Start (Astro)
 

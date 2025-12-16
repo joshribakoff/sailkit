@@ -23,7 +23,8 @@ export const DEFAULT_BINDINGS: Required<KeyBindings> = {
   scrollDown: ['Ctrl+d'],
   scrollUp: ['Ctrl+u'],
   select: ['Enter'],
-  openFinder: ['t'],
+  toggleSidebar: ['t'],
+  openFinder: ['/'],
   escape: ['Escape'],
 };
 
@@ -213,6 +214,7 @@ export function createKeyboardHandler(
     onScrollDown,
     onScrollUp,
     onSelect,
+    onToggleSidebar,
     onOpenFinder,
     onEscape,
     ignoreWhenTyping = true,
@@ -271,6 +273,12 @@ export function createKeyboardHandler(
     if (onSelect && matchesAnyKey(event, mergedBindings.select)) {
       event.preventDefault();
       onSelect();
+      return true;
+    }
+
+    if (onToggleSidebar && matchesAnyKey(event, mergedBindings.toggleSidebar)) {
+      event.preventDefault();
+      onToggleSidebar();
       return true;
     }
 

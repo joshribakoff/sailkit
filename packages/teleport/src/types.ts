@@ -21,7 +21,9 @@ export interface KeyBindings {
   scrollUp?: string[];
   /** Select/confirm (default: ['Enter']) */
   select?: string[];
-  /** Open fuzzy finder (default: ['t']) */
+  /** Toggle sidebar (default: ['t']) */
+  toggleSidebar?: string[];
+  /** Open fuzzy finder (default: ['/']) */
   openFinder?: string[];
   /** Close/escape (default: ['Escape']) */
   escape?: string[];
@@ -50,6 +52,7 @@ export interface KeyboardHandlerConfig {
   onScrollDown?: () => void;
   onScrollUp?: () => void;
   onSelect?: () => void;
+  onToggleSidebar?: () => void;
   onOpenFinder?: () => void;
   onEscape?: () => void;
   /** Ignore keystrokes when typing in input/textarea (default: true) */
@@ -82,6 +85,7 @@ export interface TeleportConfig {
   onScrollUp?: () => void;
   /** Action callbacks */
   onSelect?: () => void;
+  onToggleSidebar?: () => void;
   onOpenFinder?: () => void;
   onEscape?: () => void;
   /** Ignore keystrokes when typing in input/textarea (default: true) */

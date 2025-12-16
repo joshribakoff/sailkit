@@ -2,37 +2,29 @@
 /**
  * Teleport - Vim-style keyboard navigation for Astro sites.
  *
- * Provides j/k navigation in sidebar, Ctrl+d/u for content scroll,
- * h/l for prev/next page, and t for fuzzy finder.
+ * A thin Astro wrapper around createTeleport(). For vanilla JS usage,
+ * import createTeleport directly from '@bearing-dev/teleport'.
  */
 interface Props {
   /** CSS selector for navigable items (default: '.nav-item') */
   itemSelector?: string;
-  /** CSS selector for content container (default: 'main') */
-  contentSelector?: string;
-  /** CSS selector for sidebar container (default: '.sidebar') */
-  sidebarSelector?: string;
   /** Class to add to highlighted item (default: 'teleport-highlight') */
   highlightClass?: string;
-  /** Enable fuzzy finder (emits teleport:open-finder event) */
-  enableFinder?: boolean;
+  /** Enable wrapping at ends (default: true) */
+  wrap?: boolean;
 }
 
 const {
   itemSelector = '.nav-item',
-  contentSelector = 'main',
-  sidebarSelector = '.sidebar',
   highlightClass = 'teleport-highlight',
-  enableFinder = false,
+  wrap = true,
 } = Astro.props;
 ---
 
 <teleport-config
   data-item-selector={itemSelector}
-  data-content-selector={contentSelector}
-  data-sidebar-selector={sidebarSelector}
   data-highlight-class={highlightClass}
-  data-enable-finder={enableFinder.toString()}
+  data-wrap={wrap.toString()}
   style="display: none;"
 ></teleport-config>
 
@@ -45,26 +37,20 @@ const {
 </style>
 
 <script>
-  import { initTeleport, type Teleport } from './src/index.js';
+  import { createTeleport, type TeleportInstance } from './src/index.js';
 
-  function setupTeleport(): Teleport | null {
+  function setupTeleport(): TeleportInstance | null {
     const configEl = document.querySelector('teleport-config');
     if (!configEl) return null;
 
     const itemSelector = configEl.getAttribute('data-item-selector') || '.nav-item';
-    const contentSelector = configEl.getAttribute('data-content-selector') || 'main';
-    const sidebarSelector = configEl.getAttribute('data-sidebar-selector') || '.sidebar';
     const highlightClass = configEl.getAttribute('data-highlight-class') || 'teleport-highlight';
-    const enableFinder = configEl.getAttribute('data-enable-finder') === 'true';
+    const wrap = configEl.getAttribute('data-wrap') !== 'false';
 
-    return initTeleport({
+    return createTeleport({
       itemSelector,
-      contentContainer: contentSelector,
-      sidebarContainer: sidebarSelector,
       highlightClass,
-      onOpenFinder: enableFinder
-        ? () => document.dispatchEvent(new CustomEvent('teleport:open-finder'))
-        : undefined,
+      wrap,
     });
   }
 
