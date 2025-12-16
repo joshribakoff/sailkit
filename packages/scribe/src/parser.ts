@@ -43,6 +43,6 @@ export function filterTestableBlocks(blocks: CodeBlock[]): CodeBlock[] {
   const testableLanguages = ['typescript', 'ts', 'javascript', 'js']
   return blocks.filter(block =>
     testableLanguages.includes(block.language.toLowerCase()) &&
-    block.meta?.includes('scribe')
+    !block.meta?.includes('nocheck') // opt-out with ```ts nocheck
   )
 }

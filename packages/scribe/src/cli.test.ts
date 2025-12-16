@@ -51,7 +51,7 @@ describe('scribe CLI', () => {
     const mdPath = join(testDir, 'passing.md')
     await writeFile(mdPath, `# Test
 
-\`\`\`javascript scribe
+\`\`\`javascript
 console.log("hello")
 \`\`\`
 `)
@@ -68,7 +68,7 @@ console.log("hello")
     const mdPath = join(testDir, 'typescript.md')
     await writeFile(mdPath, `# TypeScript Test
 
-\`\`\`typescript scribe
+\`\`\`typescript
 const x: number = 42
 console.log(x)
 \`\`\`
@@ -85,7 +85,7 @@ console.log(x)
     const mdPath = join(testDir, 'failing.md')
     await writeFile(mdPath, `# Failing Test
 
-\`\`\`javascript scribe
+\`\`\`javascript
 throw new Error("oops")
 \`\`\`
 `)
@@ -99,10 +99,10 @@ throw new Error("oops")
   })
 
   it('scans directories for markdown files', async () => {
-    await writeFile(join(testDir, 'a.md'), `\`\`\`js scribe
+    await writeFile(join(testDir, 'a.md'), `\`\`\`js
 console.log(1)
 \`\`\``)
-    await writeFile(join(testDir, 'b.md'), `\`\`\`js scribe
+    await writeFile(join(testDir, 'b.md'), `\`\`\`js
 console.log(2)
 \`\`\``)
 
@@ -114,16 +114,16 @@ console.log(2)
     expect(io.stdout).toContain('Found 2 markdown file(s)')
   })
 
-  it('ignores code blocks without scribe marker', async () => {
-    const mdPath = join(testDir, 'unmarked.md')
+  it('ignores code blocks with nocheck marker', async () => {
+    const mdPath = join(testDir, 'nocheck.md')
     await writeFile(mdPath, `# Test
 
-\`\`\`javascript
+\`\`\`javascript nocheck
 // This should be ignored
 throw new Error("not run")
 \`\`\`
 
-\`\`\`javascript scribe
+\`\`\`javascript
 console.log("this runs")
 \`\`\`
 `)
@@ -138,15 +138,15 @@ console.log("this runs")
   it('runs multiple blocks in parallel when concurrency > 1', async () => {
     const mdPath = join(testDir, 'parallel.md')
     await writeFile(mdPath, `
-\`\`\`js scribe
+\`\`\`js
 console.log(1)
 \`\`\`
 
-\`\`\`js scribe
+\`\`\`js
 console.log(2)
 \`\`\`
 
-\`\`\`js scribe
+\`\`\`js
 console.log(3)
 \`\`\`
 `)
