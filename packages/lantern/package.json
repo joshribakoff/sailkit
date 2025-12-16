@@ -1,0 +1,44 @@
+{
+  "name": "@sailkit/lantern",
+  "version": "0.1.0",
+  "description": "Theme toggle with flash-free hydration",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./ThemeToggle.astro": "./ThemeToggle.astro",
+    "./theme-dark.css": "./theme-dark.css",
+    "./theme-light.css": "./theme-light.css"
+  },
+  "files": [
+    "dist",
+    "ThemeToggle.astro",
+    "theme-dark.css",
+    "theme-light.css"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": [
+    "theme",
+    "dark-mode",
+    "light-mode",
+    "toggle",
+    "flash-free",
+    "hydration"
+  ],
+  "license": "MIT"
+}

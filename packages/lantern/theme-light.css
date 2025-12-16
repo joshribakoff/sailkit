@@ -1,0 +1,7 @@
+/* Light theme example - override these in your app */
+:root[data-theme="light"] {
+  --color-bg: #fff;
+  --color-text: #1a1a1a;
+  --color-muted: #666;
+  color-scheme: light;
+}

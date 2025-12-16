@@ -1,19 +1,35 @@
-# lantern
+# @sailkit/lantern
 
-Theme toggle with correct hydration (no flash of wrong theme).
+Theme toggle with flash-free hydration.
 
-## What Ships
+## Quick Start (Astro)
 
-```
-lantern/
-├── core.ts              # initTheme, toggleTheme, getTheme, onThemeChange
-├── ThemeToggle.astro    # Drop-in component
-├── theme-base.css       # CSS variable structure
-├── theme-dark.css       # Default dark palette
-└── theme-light.css      # Default light palette
+```astro
+---
+import { initScript } from '@sailkit/lantern';
+import ThemeToggle from '@sailkit/lantern/ThemeToggle.astro';
+---
+<html>
+  <head>
+    <script is:inline set:html={initScript} />
+  </head>
+  <body>
+    <ThemeToggle />
+  </body>
+</html>
 ```
 
 ## API
+
+```typescript
+import { initTheme, toggleTheme, getTheme } from '@sailkit/lantern';
+
+initTheme();       // restore from localStorage
+toggleTheme();     // dark <-> light
+getTheme();        // 'dark' | 'light'
+```
+
+### Functions
 
 ```typescript
 function initTheme(): 'light' | 'dark';
@@ -22,49 +38,36 @@ function setTheme(theme: 'light' | 'dark'): void;
 function toggleTheme(): 'light' | 'dark';
 function onThemeChange(callback: (theme: 'light' | 'dark') => void): () => void;
 
-// Convention:
-// - Stores in localStorage key: 'theme'
-// - Sets data-theme attribute on <html>
-// - CSS uses [data-theme="dark"] selectors
+const initScript: string;  // minified script for flash prevention
 ```
 
-## Usage Levels
+### ThemeToggle Component
 
 ```astro
-// Full (component + all styles)
----
-import { ThemeToggle } from 'astro-lantern';
-import 'astro-lantern/theme-base.css';
-import 'astro-lantern/theme-dark.css';
-import 'astro-lantern/theme-light.css';
----
 <ThemeToggle />
-
-// BYO styles
----
-import { ThemeToggle } from 'astro-lantern';
-import 'astro-lantern/theme-base.css';
-import './my-themes.css';
----
-<ThemeToggle />
-
-// BYO button
----
-import { initTheme, toggleTheme } from 'astro-lantern/core';
----
-<script>initTheme();</script>
-<button onclick="toggleTheme()">Toggle</button>
+<ThemeToggle showLabel={false} />
+<ThemeToggle class="my-custom-class" />
 ```
 
 ## Flash Prevention
 
-The component includes an inline script that runs before paint:
+Include `initScript` before paint to prevent flash of wrong theme:
 
-```html
-<script is:inline>
-  (function() {
-    const stored = localStorage.getItem('theme');
-    document.documentElement.setAttribute('data-theme', stored || 'dark');
-  })();
-</script>
+```astro
+<script is:inline set:html={initScript} />
 ```
+
+## Convention
+
+- Stores in localStorage key: `theme`
+- Sets `data-theme` attribute on `<html>`
+- CSS uses `[data-theme="dark"]` selectors
+
+## Optional Example CSS
+
+```typescript
+import '@sailkit/lantern/theme-dark.css';
+import '@sailkit/lantern/theme-light.css';
+```
+
+These are minimal examples. Override with your own theme CSS.

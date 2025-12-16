@@ -1,0 +1,79 @@
+---
+/**
+ * Theme toggle button component.
+ *
+ * Provides a button that toggles between light and dark themes.
+ * Style with CSS using the .theme-toggle class or pass a custom class.
+ */
+interface Props {
+  class?: string;
+  /** Show text label next to icon (default: true) */
+  showLabel?: boolean;
+}
+
+const { class: className = '', showLabel = true } = Astro.props;
+---
+
+<button
+  class:list={['theme-toggle', className]}
+  id="theme-toggle"
+  type="button"
+  aria-label="Toggle theme"
+>
+  <span class="theme-toggle-icon" id="theme-icon"></span>
+  {showLabel && <span class="theme-toggle-label" id="theme-label"></span>}
+</button>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    opacity: 0.8;
+  }
+  .theme-toggle:hover {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  function initThemeToggle() {
+    const icon = document.getElementById('theme-icon');
+    const label = document.getElementById('theme-label');
+    const button = document.getElementById('theme-toggle');
+
+    function updateButton(theme: string) {
+      if (icon) {
+        icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+      }
+      if (label) {
+        label.textContent = theme === 'dark' ? 'Light' : 'Dark';
+      }
+    }
+
+    // Sync on load
+    updateButton(document.documentElement.getAttribute('data-theme') || 'dark');
+
+    // Handle click
+    button?.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateButton(next);
+    });
+  }
+
+  // Run on initial load
+  initThemeToggle();
+
+  // Re-run after Astro page transitions
+  document.addEventListener('astro:after-swap', initThemeToggle);
+</script>

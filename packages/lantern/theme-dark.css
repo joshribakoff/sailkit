@@ -1,0 +1,7 @@
+/* Dark theme example - override these in your app */
+:root[data-theme="dark"] {
+  --color-bg: #1a1a1a;
+  --color-text: #f5f5f5;
+  --color-muted: #888;
+  color-scheme: dark;
+}
