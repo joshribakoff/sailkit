@@ -12,7 +12,8 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npx serve . -l 3000',
+    // Serve from monorepo root to allow cross-package imports
+    command: 'npx serve ../.. -l 3000',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
   },

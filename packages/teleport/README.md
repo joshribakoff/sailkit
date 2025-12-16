@@ -43,6 +43,34 @@ Mousetrap.bind('j', () => {
 
 **Framework-agnostic.** The core is pure JavaScript. The Astro component is a convenience wrapper.
 
+## Architecture
+
+The flow from keypress to DOM update:
+
+```
+KEYPRESS
+└─► createKeyboardHandler (keys.ts)
+    └─► Matches key against bindings
+    └─► Calls callback (onDown, onUp, etc.)
+
+STATE UPDATE
+└─► handleNavigationAction (navigator.ts)
+    └─► Checks sidebar visibility
+    └─► Delegates to Compass: navigator.next() / navigator.prev()
+    └─► Compass fires onChange callback
+
+DOM UPDATE
+└─► updateHighlight (navigator.ts)
+    └─► Removes highlight class from all items
+    └─► Adds highlight class to current item
+    └─► Scrolls item into view
+```
+
+**Single sources of truth:**
+- **Key bindings**: `createKeyboardHandler()` in `keys.ts`
+- **Navigation state**: Compass `createNavigator()` - Teleport never maintains its own index
+- **DOM updates**: `updateHighlight()` in `navigator.ts`
+
 ```javascript
 // Works anywhere - no framework required
 import { createTeleport } from '@bearing-dev/teleport';

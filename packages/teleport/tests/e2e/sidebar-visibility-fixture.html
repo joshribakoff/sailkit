@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidebar Visibility Test Fixture</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #f5f5f5;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+      padding: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hidden states we want to detect */
+    .sidebar.hidden-display { display: none; }
+    .sidebar.hidden-visibility { visibility: hidden; }
+    .sidebar.hidden-opacity { opacity: 0; }
+    .sidebar.hidden-transform { transform: translateX(-100%); }
+    .sidebar.hidden-class { } /* Just the class presence */
+    .sidebar.collapsed { }
+    .sidebar[hidden] { display: none; }
+
+    .nav-item {
+      display: block;
+      padding: 0.5rem 1rem;
+      margin: 0.25rem 0;
+      text-decoration: none;
+      color: #333;
+      border-radius: 4px;
+    }
+
+    .nav-item:hover {
+      background: #e5e5e5;
+    }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .teleport-highlight {
+      outline: 2px solid #3b82f6;
+      outline-offset: -2px;
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 0.5rem 1rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #status {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      padding: 0.5rem;
+      background: #333;
+      color: white;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" id="sidebar">
+    <a href="#section-1" class="nav-item">Section 1</a>
+    <a href="#section-2" class="nav-item">Section 2</a>
+    <a href="#section-3" class="nav-item">Section 3</a>
+    <a href="#section-4" class="nav-item">Section 4</a>
+    <a href="#section-5" class="nav-item">Section 5</a>
+  </nav>
+
+  <main>
+    <h1>Sidebar Visibility Test</h1>
+    <p>Use the buttons to test different hiding methods.</p>
+    <div style="margin-top: 1rem;">
+      <button class="toggle-btn" onclick="hideSidebar('display')">Hide (display:none)</button>
+      <button class="toggle-btn" onclick="hideSidebar('visibility')">Hide (visibility)</button>
+      <button class="toggle-btn" onclick="hideSidebar('opacity')">Hide (opacity)</button>
+      <button class="toggle-btn" onclick="hideSidebar('transform')">Hide (transform)</button>
+      <button class="toggle-btn" onclick="hideSidebar('hidden-class')">Hide (.hidden class)</button>
+      <button class="toggle-btn" onclick="hideSidebar('collapsed-class')">Hide (.collapsed class)</button>
+      <button class="toggle-btn" onclick="hideSidebar('hidden-attr')">Hide ([hidden] attr)</button>
+      <button class="toggle-btn" onclick="showSidebar()">Show Sidebar</button>
+    </div>
+  </main>
+
+  <div id="status">Sidebar: visible</div>
+
+  <script type="module">
+    import { createTeleport } from '/packages/teleport/dist/index.js';
+
+    // Get config from URL params (for test flexibility)
+    const params = new URLSearchParams(window.location.search);
+    const whenHidden = params.get('whenHidden') || 'ignore';
+
+    const teleport = createTeleport({
+      itemSelector: '.nav-item',
+      sidebarSelector: '.sidebar',
+      highlightClass: 'teleport-highlight',
+      whenHidden: whenHidden,
+    });
+
+    // Expose for testing
+    window.teleport = teleport;
+    window.whenHidden = whenHidden;
+
+    // Track toggle events
+    window.toggleCount = 0;
+    document.addEventListener('teleport:toggle-sidebar', () => {
+      window.toggleCount++;
+      console.log('teleport:toggle-sidebar event fired', window.toggleCount);
+    });
+
+    // Helper functions for hiding/showing
+    window.hideSidebar = function(method) {
+      const sidebar = document.getElementById('sidebar');
+      // Clear all hidden states first
+      showSidebar();
+
+      switch(method) {
+        case 'display':
+          sidebar.classList.add('hidden-display');
+          break;
+        case 'visibility':
+          sidebar.classList.add('hidden-visibility');
+          break;
+        case 'opacity':
+          sidebar.classList.add('hidden-opacity');
+          break;
+        case 'transform':
+          sidebar.classList.add('hidden-transform');
+          break;
+        case 'hidden-class':
+          sidebar.classList.add('hidden');
+          break;
+        case 'collapsed-class':
+          sidebar.classList.add('collapsed');
+          break;
+        case 'hidden-attr':
+          sidebar.setAttribute('hidden', '');
+          break;
+      }
+      document.getElementById('status').textContent = 'Sidebar: hidden (' + method + ')';
+    };
+
+    window.showSidebar = function() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.remove('hidden-display', 'hidden-visibility', 'hidden-opacity', 'hidden-transform', 'hidden', 'collapsed');
+      sidebar.removeAttribute('hidden');
+      document.getElementById('status').textContent = 'Sidebar: visible';
+    };
+
+    // Track which item is highlighted
+    window.getHighlightedIndex = function() {
+      const items = document.querySelectorAll('.nav-item');
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].classList.contains('teleport-highlight')) {
+          return i;
+        }
+      }
+      return -1;
+    };
+  </script>
+</body>
+</html>

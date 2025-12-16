@@ -59,14 +59,18 @@
     <div class="content-block">Block 6</div>
   </div>
   <script type="module">
-    import { initTeleport } from '/dist/index.js';
+    import { initTeleport, scrollElement, getViewportHeight } from '/packages/teleport/dist/index.js';
 
-    // No contentContainer specified - should fallback to window/document
+    // No contentContainer - fallback to window scroll
     window.teleport = initTeleport({
       itemSelector: '.nav-item',
-      // contentContainer intentionally omitted
-      sidebarContainer: '.sidebar',
       highlightClass: 'teleport-highlight',
+      onScrollDown: () => {
+        window.scrollBy({ top: getViewportHeight() / 2, behavior: 'smooth' });
+      },
+      onScrollUp: () => {
+        window.scrollBy({ top: -getViewportHeight() / 2, behavior: 'smooth' });
+      },
     });
   </script>
 </body>

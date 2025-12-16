@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teleport E2E Test Fixture</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@bearing-dev/compass": "/packages/compass/dist/index.js"
+      }
+    }
+  </script>
   <style>
     * {
       box-sizing: border-box;
@@ -91,13 +98,12 @@
   </main>
 
   <script type="module">
-    import { initTeleport } from '/dist/index.js';
+    import { createTeleport } from '/packages/teleport/dist/index.js';
 
-    const teleport = initTeleport({
+    const teleport = createTeleport({
       itemSelector: '.nav-item',
-      contentContainer: 'main',
-      sidebarContainer: '.sidebar',
       highlightClass: 'teleport-highlight',
+      // No sidebarSelector - navigation always works
     });
 
     // Expose for testing

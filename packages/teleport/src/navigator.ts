@@ -123,8 +123,17 @@ export function createTeleport(config: CreateTeleportConfig): TeleportInstance {
     if (sidebar.classList.contains('collapsed')) return false;
     if (sidebar.hasAttribute('hidden')) return false;
 
-    // Check transform (often used for off-screen sidebars)
-    if (style.transform.includes('translateX(-')) return false;
+    // Check transform - browser converts translateX to matrix(a,b,c,d,tx,ty)
+    // A negative tx means the element is translated left (off-screen)
+    const transform = style.transform;
+    if (transform && transform !== 'none') {
+      const match = transform.match(/matrix\([^,]+,\s*[^,]+,\s*[^,]+,\s*[^,]+,\s*([^,]+)/);
+      if (match) {
+        const tx = parseFloat(match[1]);
+        // If translated left by more than half the sidebar width, consider hidden
+        if (tx < -(sidebar.offsetWidth / 2)) return false;
+      }
+    }
 
     return true;
   }
@@ -158,6 +167,7 @@ export function createTeleport(config: CreateTeleportConfig): TeleportInstance {
     navigator = createNavigator({
       items,
       wrap,
+      initialIndex: -1, // Start with no selection
       onChange: (_prev: string | null, _next: string | null, index: number) => {
         updateHighlight(index);
       },

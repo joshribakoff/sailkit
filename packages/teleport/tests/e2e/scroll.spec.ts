@@ -75,7 +75,7 @@ const TEST_HTML = `
 test.describe('Scroll bindings', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the test fixture server and set content
-    await page.goto('/tests/e2e/scroll-fixture.html');
+    await page.goto('/packages/teleport/tests/e2e/scroll-fixture.html');
   });
 
   test('Ctrl+d scrolls main content down', async ({ page }) => {
@@ -194,7 +194,7 @@ test.describe('Scroll bindings', () => {
 test.describe('Scroll fallback behavior', () => {
   test('Fallback to window when no contentContainer specified', async ({ page }) => {
     // Use a different fixture that doesn't specify contentContainer
-    await page.goto('/tests/e2e/scroll-fallback-fixture.html');
+    await page.goto('/packages/teleport/tests/e2e/scroll-fallback-fixture.html');
 
     // Get initial window scroll
     const initialWindowScroll = await page.evaluate(() => window.scrollY);

@@ -58,13 +58,24 @@
     <div class="content-block">Block 8</div>
   </div>
   <script type="module">
-    import { initTeleport } from '/dist/index.js';
+    import { initTeleport, scrollElement, getViewportHeight } from '/packages/teleport/dist/index.js';
+
+    // Scroll fixture - tests scrolling a specific container
+    const mainContent = document.querySelector('.main-content');
 
     window.teleport = initTeleport({
       itemSelector: '.nav-item',
-      contentContainer: '.main-content',
-      sidebarContainer: '.sidebar',
       highlightClass: 'teleport-highlight',
+      onScrollDown: () => {
+        if (mainContent) {
+          mainContent.scrollBy({ top: getViewportHeight() / 2, behavior: 'smooth' });
+        }
+      },
+      onScrollUp: () => {
+        if (mainContent) {
+          mainContent.scrollBy({ top: -getViewportHeight() / 2, behavior: 'smooth' });
+        }
+      },
     });
   </script>
 </body>

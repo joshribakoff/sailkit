@@ -314,26 +314,26 @@ describe('createKeyboardHandler', () => {
     } as unknown as KeyboardEvent;
   }
 
-  it('calls onNextItem for j key', () => {
-    const onNextItem = vi.fn();
-    const handler = createKeyboardHandler({ onNextItem });
+  it('calls onDown for j key', () => {
+    const onDown = vi.fn();
+    const handler = createKeyboardHandler({ onDown });
 
     const event = createEvent('j');
     const handled = handler.handleKeydown(event);
 
     expect(handled).toBe(true);
-    expect(onNextItem).toHaveBeenCalled();
+    expect(onDown).toHaveBeenCalled();
     expect(event.preventDefault).toHaveBeenCalled();
   });
 
-  it('calls onPrevItem for k key', () => {
-    const onPrevItem = vi.fn();
-    const handler = createKeyboardHandler({ onPrevItem });
+  it('calls onUp for k key', () => {
+    const onUp = vi.fn();
+    const handler = createKeyboardHandler({ onUp });
 
     const event = createEvent('k');
     handler.handleKeydown(event);
 
-    expect(onPrevItem).toHaveBeenCalled();
+    expect(onUp).toHaveBeenCalled();
   });
 
   it('calls onScrollDown for Ctrl+d', () => {
@@ -347,33 +347,33 @@ describe('createKeyboardHandler', () => {
   });
 
   it('ignores keys when typing in input', () => {
-    const onNextItem = vi.fn();
-    const handler = createKeyboardHandler({ onNextItem });
+    const onDown = vi.fn();
+    const handler = createKeyboardHandler({ onDown });
 
     const input = document.createElement('input');
     const event = createEvent('j', input);
     const handled = handler.handleKeydown(event);
 
     expect(handled).toBe(false);
-    expect(onNextItem).not.toHaveBeenCalled();
+    expect(onDown).not.toHaveBeenCalled();
   });
 
   it('does not ignore keys when ignoreWhenTyping is false', () => {
-    const onNextItem = vi.fn();
-    const handler = createKeyboardHandler({ onNextItem, ignoreWhenTyping: false });
+    const onDown = vi.fn();
+    const handler = createKeyboardHandler({ onDown, ignoreWhenTyping: false });
 
     const input = document.createElement('input');
     const event = createEvent('j', input);
     handler.handleKeydown(event);
 
-    expect(onNextItem).toHaveBeenCalled();
+    expect(onDown).toHaveBeenCalled();
   });
 
   it('supports custom bindings', () => {
-    const onNextItem = vi.fn();
+    const onDown = vi.fn();
     const handler = createKeyboardHandler({
-      onNextItem,
-      bindings: { nextItem: ['n'] },
+      onDown,
+      bindings: { down: ['n'] },
     });
 
     // 'j' should no longer work
@@ -381,20 +381,21 @@ describe('createKeyboardHandler', () => {
 
     // 'n' should work
     expect(handler.handleKeydown(createEvent('n'))).toBe(true);
-    expect(onNextItem).toHaveBeenCalled();
+    expect(onDown).toHaveBeenCalled();
   });
 });
 
 describe('DEFAULT_BINDINGS', () => {
   it('has all expected bindings', () => {
-    expect(DEFAULT_BINDINGS.nextItem).toContain('j');
-    expect(DEFAULT_BINDINGS.prevItem).toContain('k');
+    expect(DEFAULT_BINDINGS.down).toContain('j');
+    expect(DEFAULT_BINDINGS.up).toContain('k');
     expect(DEFAULT_BINDINGS.scrollDown).toContain('Ctrl+d');
     expect(DEFAULT_BINDINGS.scrollUp).toContain('Ctrl+u');
-    expect(DEFAULT_BINDINGS.nextPage).toContain('l');
-    expect(DEFAULT_BINDINGS.prevPage).toContain('h');
+    expect(DEFAULT_BINDINGS.right).toContain('l');
+    expect(DEFAULT_BINDINGS.left).toContain('h');
     expect(DEFAULT_BINDINGS.select).toContain('Enter');
-    expect(DEFAULT_BINDINGS.openFinder).toContain('t');
+    expect(DEFAULT_BINDINGS.toggleSidebar).toContain('t');
+    expect(DEFAULT_BINDINGS.openFinder).toContain('/');
     expect(DEFAULT_BINDINGS.escape).toContain('Escape');
   });
 });

@@ -21,10 +21,12 @@ import { buildFlatList } from './buildFlatList.js';
  * Create a navigator for the given items.
  */
 export function createNavigator(config: NavigatorConfig): Navigator {
-  const { items, wrap = true, leavesOnly = false, onChange } = config;
+  const { items, wrap = true, leavesOnly = false, initialIndex, onChange } = config;
 
   const flatList = buildFlatList(items, leavesOnly);
-  let currentIdx = flatList.length > 0 ? 0 : -1;
+  // Default to 0 if items exist, but allow initialIndex to override (including -1 for no selection)
+  const defaultIdx = flatList.length > 0 ? 0 : -1;
+  let currentIdx = initialIndex !== undefined ? initialIndex : defaultIdx;
 
   function getCurrent(): InternalNode | null {
     return currentIdx >= 0 && currentIdx < flatList.length
