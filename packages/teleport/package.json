@@ -26,10 +26,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@bearing-dev/compass": ">=0.0.1"
+    "@bearing-dev/compass": "*"
   },
   "devDependencies": {
-    "@bearing-dev/compass": "file:../compass",
     "@playwright/test": "^1.57.0",
     "jsdom": "^25.0.0",
     "serve": "^14.2.5",

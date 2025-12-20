@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @bearing-dev/compass -w @bearing-dev/lantern && npm run build -w @bearing-dev/teleport --if-present",
     "prepare": "npm run build"
   },
   "devDependencies": {
