@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm'],
-  dts: true,
+  dts: false, // Disabled due to workspace build order issues
   clean: true,
   // Keep compass as external dependency (resolved at runtime)
   external: ['@bearing-dev/compass'],
