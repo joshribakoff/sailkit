@@ -32,6 +32,12 @@ nav.firstChild(); // ch-1 → 1.1
 - `wrap` - loop around at the ends (default: true)
 - `leavesOnly` - skip parents, only visit leaves
 
+## Prior Art
+
+- **Roving tabindex** — The accessibility pattern where one item in a widget is tabbable at a time, arrow keys move focus. Compass implements this logic headlessly.
+- **Screen reader navigation** — VoiceOver/NVDA let users jump by granularity (character → word → paragraph → heading). A future direction for Compass.
+- **Emacs buffer list** — Uniform navigation interface for any list (files, search results, commits). Same idea: decouple navigation logic from content.
+
 ## Details
 
 No framework needed. Handles edge cases like wrapping, siblings, and depth-first traversal. See [`src/types.ts`](./src/types.ts) for full API.

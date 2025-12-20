@@ -57,6 +57,11 @@ Include `initScript` before paint to prevent flash of wrong theme:
 <script is:inline set:html={initScript} />
 ```
 
+## Prior Art
+
+- **`prefers-color-scheme`** — The CSS media query that detects OS preference. Lantern builds on this, adding persistence and toggle UI.
+- **next-themes** — Solves the same flash-prevention problem for Next.js. Lantern is framework-agnostic.
+
 ## Convention
 
 - Stores in localStorage key: `theme`

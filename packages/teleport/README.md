@@ -33,6 +33,11 @@ Mousetrap.bind('j', () => {
 });
 ```
 
+## Prior Art
+
+- **Vimium** — Browser extension adding Vim-style navigation to any webpage. Teleport is similar but site-specific: it understands your sidebar structure rather than being generic.
+- **GNU Readline** — The library behind bash/REPL input (`Ctrl+a`, `Ctrl+e`, `Ctrl+w`). Emacs-style keybindings some users expect as an alternative to Vim's hjkl.
+
 ## Design Philosophy
 
 **Drop-in for any website.** Teleport is a vanilla JavaScript library that works with any DOM. Just provide CSS selectors and it handles everything else.
