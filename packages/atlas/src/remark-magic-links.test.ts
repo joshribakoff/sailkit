@@ -89,6 +89,38 @@ describe('remarkMagicLinks', () => {
       const result = await process('Use `[[syntax]]` for links.');
       expect(result).toContain('`[[syntax]]`');
     });
+
+    // Generates markdown with N levels of nesting around a code block
+    function nestCode(levels: number, useInlineCode: boolean): string {
+      const codeContent = useInlineCode
+        ? '`[[not-a-link]]`'
+        : '```\n[[not-a-link]]\n```';
+
+      let result = codeContent;
+      for (let i = 0; i < levels; i++) {
+        // Alternate between list and blockquote for variety
+        if (i % 2 === 0) {
+          result = `- ${result.split('\n').join('\n  ')}`; // list
+        } else {
+          result = result.split('\n').map(line => `> ${line}`).join('\n'); // blockquote
+        }
+      }
+      return result;
+    }
+
+    it.each([1, 2, 3, 4, 5])('code block at %i nesting levels', async (levels) => {
+      const input = nestCode(levels, false);
+      const result = await process(input);
+      expect(result).toContain('[[not-a-link]]');
+      expect(result).not.toContain('/concepts/not-a-link/');
+    });
+
+    it.each([1, 2, 3, 4, 5])('inline code at %i nesting levels', async (levels) => {
+      const input = nestCode(levels, true);
+      const result = await process(input);
+      expect(result).toContain('[[not-a-link]]');
+      expect(result).not.toContain('/concepts/not-a-link/');
+    });
   });
 
   describe('urlBuilder callback', () => {
