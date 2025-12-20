@@ -1,0 +1,17 @@
+
+> @bearing-dev/teleport@0.0.1 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/joshribakoff/bearing-dev/packages/teleport/tsup.config.ts
+CLI Target: es2020
+CLI Cleaning output folder
+ESM Build start
+ESM dist/index.js     20.58 KB
+ESM dist/index.js.map 47.13 KB
+ESM ⚡️ Build success in 32ms
+DTS Build start
+DTS ⚡️ Build success in 1318ms
+DTS dist/index.d.ts 8.70 KB
